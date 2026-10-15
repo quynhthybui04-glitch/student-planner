@@ -1,14 +1,98 @@
 <!doctype html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f7f8fc" />
-    <meta name="description" content="Student Planner - Quản lý kế hoạch học tập cá nhân." />
-    <title>Student Planner</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f36f21">
+  <title>Student Planner | FPT University</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">S</span><div><strong>STUDENT<span>PLANNER</span></strong><small>FPT UNIVERSITY</small></div></div>
+    <div class="profile"><div class="avatar">SV</div><div><strong>Sinh viên</strong><small>Năm nhất · FPTU Đà Nẵng</small></div></div>
+    <nav>
+      <button class="nav-item active" data-view="dashboard"><span>▦</span> Tổng quan</button>
+      <button class="nav-item" data-view="tasks"><span>☑</span> Công việc</button>
+      <button class="nav-item" data-view="schedule"><span>▦</span> Lịch học</button>
+      <button class="nav-item" data-view="subjects"><span>▤</span> Môn học</button>
+    </nav>
+    <div class="sidebar-bottom"><div class="mini-label">HỌC TẬP HIỆU QUẢ</div><p>Chia nhỏ mục tiêu.<br>Hoàn thành từng bước.</p><span class="orange-line"></span></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <button class="mobile-menu" id="mobileMenu" aria-label="Mở menu">☰</button>
+      <div><div class="eyebrow">KHÔNG GIAN HỌC TẬP CỦA BẠN</div><h1 id="pageTitle">Tổng quan</h1></div>
+      <div class="top-actions"><span class="today" id="todayLabel"></span><button class="primary-btn" id="addTaskTop">＋ Thêm công việc</button></div>
+    </header>
+
+    <section class="view active" id="dashboardView">
+      <div class="welcome"><div><span class="welcome-tag">STUDENT PLANNER</span><h2>Xin chào, sinh viên! <span>✦</span></h2><p>Lên kế hoạch tốt hôm nay, tiến gần mục tiêu ngày mai.</p></div><div class="welcome-symbol">FPT<span>U</span></div></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-top"><span>Tổng công việc</span><span class="stat-icon">▤</span></div><strong id="totalStat">0</strong><small>Trong kế hoạch của bạn</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Đã hoàn thành</span><span class="stat-icon green">✓</span></div><strong id="doneStat">0</strong><small>Công việc hoàn tất</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Sắp đến hạn</span><span class="stat-icon orange">◷</span></div><strong id="dueStat">0</strong><small>Trong 3 ngày tới</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Quá hạn</span><span class="stat-icon red">!</span></div><strong id="overdueStat">0</strong><small>Cần được chú ý</small></article>
+      </div>
+      <div class="dashboard-grid">
+        <section class="panel progress-panel"><div class="panel-heading"><div><h3>Tiến độ học tập</h3><p>Theo dõi những gì bạn đã hoàn thành</p></div><span class="round-icon">↗</span></div><div class="progress-content"><div class="progress-ring" id="progressRing"><div><strong id="progressPercent">0%</strong><small>hoàn thành</small></div></div><div class="progress-notes"><strong id="progressMessage">Bắt đầu thôi!</strong><p id="progressDetail">Mỗi công việc hoàn thành là một bước tiến.</p><div class="legend"><span><i class="dot done-dot"></i> Đã hoàn thành</span><span><i class="dot todo-dot"></i> Chưa hoàn thành</span></div></div></div></section>
+        <section class="panel"><div class="panel-heading"><div><h3>Việc cần làm</h3><p>Ưu tiên những đầu việc gần nhất</p></div><button class="text-btn" data-go="tasks">Xem tất cả →</button></div><div id="upcomingList" class="task-list"></div></section>
+      </div>
+      <section class="panel schedule-preview"><div class="panel-heading"><div><h3>Lịch học gần đây</h3><p>Các buổi học đã được lên kế hoạch</p></div><button class="text-btn" data-go="schedule">Xem lịch →</button></div><div id="schedulePreview" class="schedule-list"></div></section>
+    </section>
+
+    <section class="view" id="tasksView">
+      <div class="section-intro"><div><h2>Danh sách công việc</h2><p>Quản lý bài tập, dự án và deadline của bạn.</p></div><button class="primary-btn" id="addTaskList">＋ Thêm công việc</button></div>
+      <div class="filter-row"><input id="taskSearch" class="search-input" placeholder="⌕  Tìm công việc hoặc môn học..."><select id="statusFilter"><option value="all">Tất cả trạng thái</option><option value="todo">Chưa hoàn thành</option><option value="done">Đã hoàn thành</option><option value="overdue">Quá hạn</option></select><select id="priorityFilter"><option value="all">Mọi mức ưu tiên</option><option value="high">Cao</option><option value="medium">Trung bình</option><option value="low">Thấp</option></select></div>
+      <div class="panel table-panel"><div class="task-list full-task-list" id="allTasksList"></div></div>
+    </section>
+
+    <section class="view" id="scheduleView">
+      <div class="section-intro"><div><h2>Lịch học</h2><p>Thời khóa biểu mẫu cho tuần học của bạn.</p></div><button class="primary-btn" id="addScheduleBtn">＋ Thêm buổi học</button></div>
+      <div class="schedule-callout"><strong>✦ Mẹo nhỏ</strong><span>Hãy dành thời gian nghỉ giữa các buổi học để duy trì sự tập trung.</span></div>
+      <div class="panel"><div class="panel-heading"><div><h3>Thời khóa biểu</h3><p>Nhấn xóa nếu muốn bỏ một buổi học mẫu.</p></div></div><div id="fullSchedule" class="schedule-list"></div></div>
+    </section>
+
+    <section class="view" id="subjectsView">
+      <div class="section-intro"><div><h2>Môn học của tôi</h2><p>Tập hợp các môn học trong học kỳ.</p></div><button class="primary-btn" id="addSubjectBtn">＋ Thêm môn học</button></div>
+      <div class="subject-grid" id="subjectGrid"></div>
+    </section>
+
+    <footer>STUDENT PLANNER <span>•</span> Bài tập thực hành HTML, CSS & JavaScript <span class="footer-right">Dữ liệu lưu trên thiết bị của bạn</span></footer>
+  </main>
+
+  <dialog id="taskDialog">
+    <form id="taskForm" method="dialog">
+      <div class="modal-heading"><div><span class="eyebrow">KẾ HOẠCH CÁ NHÂN</span><h2 id="taskDialogTitle">Thêm công việc</h2></div><button type="button" class="close-btn" data-close="taskDialog">×</button></div>
+      <input type="hidden" id="taskId">
+      <label for="taskTitle">Tên công việc *</label><input id="taskTitle" required maxlength="100" placeholder="VD: Hoàn thành bài tập AIF101">
+      <div class="form-grid"><div><label for="taskSubject">Môn học</label><select id="taskSubject"></select></div><div><label for="taskType">Loại công việc</label><select id="taskType"><option>Bài tập</option><option>Dự án</option><option>Ôn tập</option><option>Thuyết trình</option><option>Khác</option></select></div></div>
+      <div class="form-grid"><div><label for="taskDeadline">Hạn hoàn thành *</label><input type="date" id="taskDeadline" required></div><div><label for="taskPriority">Mức ưu tiên</label><select id="taskPriority"><option value="high">Cao</option><option value="medium" selected>Trung bình</option><option value="low">Thấp</option></select></div></div>
+      <label for="taskNotes">Ghi chú</label><textarea id="taskNotes" rows="3" placeholder="Mô tả ngắn hoặc các bước cần làm..."></textarea>
+      <div class="modal-actions"><button type="button" class="secondary-btn" data-close="taskDialog">Hủy</button><button type="submit" class="primary-btn">Lưu công việc</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="scheduleDialog">
+    <form id="scheduleForm" method="dialog">
+      <div class="modal-heading"><div><span class="eyebrow">THỜI KHÓA BIỂU</span><h2>Thêm buổi học</h2></div><button type="button" class="close-btn" data-close="scheduleDialog">×</button></div>
+      <label for="scheduleSubject">Tên môn học *</label><input id="scheduleSubject" required placeholder="VD: Nhập môn AI">
+      <div class="form-grid"><div><label for="scheduleDay">Thứ</label><select id="scheduleDay"><option value="1">Thứ 2</option><option value="2">Thứ 3</option><option value="3">Thứ 4</option><option value="4">Thứ 5</option><option value="5">Thứ 6</option><option value="6">Thứ 7</option><option value="0">Chủ nhật</option></select></div><div><label for="scheduleTime">Giờ học</label><input id="scheduleTime" type="time" value="08:00" required></div></div>
+      <label for="scheduleRoom">Phòng học / hình thức</label><input id="scheduleRoom" placeholder="VD: Phòng A-203">
+      <div class="modal-actions"><button type="button" class="secondary-btn" data-close="scheduleDialog">Hủy</button><button type="submit" class="primary-btn">Lưu buổi học</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="subjectDialog">
+    <form id="subjectForm" method="dialog">
+      <div class="modal-heading"><div><span class="eyebrow">HỌC KỲ CỦA BẠN</span><h2>Thêm môn học</h2></div><button type="button" class="close-btn" data-close="subjectDialog">×</button></div>
+      <label for="subjectName">Tên môn học *</label><input id="subjectName" required maxlength="60" placeholder="VD: AIF101">
+      <label for="subjectTeacher">Giảng viên / ghi chú</label><input id="subjectTeacher" placeholder="VD: Giảng viên bộ môn">
+      <div class="modal-actions"><button type="button" class="secondary-btn" data-close="subjectDialog">Hủy</button><button type="submit" class="primary-btn">Lưu môn học</button></div>
+    </form>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
 </html>
